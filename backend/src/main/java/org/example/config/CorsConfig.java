@@ -14,7 +14,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOriginPatterns(
-                List.of("http://localhost:3000","http://localhost:3001","https://*.vercel.app"));
+                List.of("http://localhost:3000","http://localhost:3001","https://*.vercel.app", "https://*.onrender.com", "https://*.netlify.app"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(
                 List.of(
