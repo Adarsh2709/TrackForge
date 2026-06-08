@@ -43,8 +43,8 @@ export default function IssueDetailsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleStatusChange = async (newStatus: string) => {
-    if (!issue) return;
+  const handleStatusChange = async (newStatus: string | null) => {
+    if (!issue || !newStatus) return;
     try {
       setIsUpdating(true);
       const response = await api.put(`/issues/${issue.id}`, {
