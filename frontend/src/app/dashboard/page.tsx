@@ -2,16 +2,31 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, LayoutDashboard, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import Image from "next/image";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IssueTable } from "@/components/issues/IssueTable";
-import { MetricsCard } from "@/components/shared/MetricsCard";
+import { BrandedWidget } from "@/components/dashboard/BrandedWidget";
 import { api } from "@/services/api";
 import { Issue } from "@/types";
 
 export default function DashboardPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userName, setUserName] = useState("Builder");
+
+  useEffect(() => {
+    // Attempt to get user name from local storage
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.name) setUserName(user.name.split(" ")[0]);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
 
   const fetchIssues = async () => {
     try {
@@ -28,66 +43,120 @@ export default function DashboardPage() {
     fetchIssues();
   }, []);
 
-  const openIssues = issues.filter((i) => i.status === "Open" || i.status === "In Progress").length;
+  const openIssues = issues.filter((i) => i.status === "Open").length;
+  const inProgressIssues = issues.filter((i) => i.status === "In Progress" || i.status === "In Review").length;
   const resolvedIssues = issues.filter((i) => i.status === "Resolved" || i.status === "Closed").length;
   const criticalIssues = issues.filter((i) => i.priority === "Critical" && i.status !== "Resolved" && i.status !== "Closed").length;
 
+  const totalActive = openIssues + inProgressIssues;
+
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6 max-w-screen-2xl mx-auto w-full">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground">
-            Overview of your project issues and metrics.
-          </p>
+    <div className="flex-1 space-y-12 p-8 pt-10 max-w-screen-2xl mx-auto w-full font-sans">
+      
+      {/* Welcome Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-border/50 pb-8">
+        <div className="flex items-center gap-6">
+          <div className="hidden sm:block w-24 h-24 relative transform -rotate-6 hover:rotate-0 transition-transform duration-500">
+            <Image
+              src="/assets/hero_mascot.png"
+              alt="TrackForge Mascot"
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-contain drop-shadow-xl"
+            />
+          </div>
+          <div>
+            <h1 className="font-heading font-black text-4xl md:text-5xl tracking-tight text-foreground mb-2">
+              Good Morning, {userName}.
+            </h1>
+            <p className="text-secondary text-lg font-medium flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+              </span>
+              You have {totalActive} issues that need attention today.
+            </p>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div>
           <Link href="/create-issue">
-            <Button className="h-10">
-              <Plus className="mr-2 h-4 w-4" /> New Issue
+            <Button size="lg" className="h-14 px-8 font-bold text-lg border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
+              <Plus className="mr-2 h-6 w-6" /> New Issue
             </Button>
           </Link>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricsCard
-          title="Total Issues"
-          value={issues.length}
-          icon={LayoutDashboard}
-        />
-        <MetricsCard
-          title="Open & In Progress"
+      {/* Overview Widgets */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <BrandedWidget
+          title="Open Issues"
           value={openIssues}
-          icon={Clock}
-          trend={`${Math.round((openIssues / (issues.length || 1)) * 100)}% of total`}
+          imageSrc="/assets/bug_mascot.png"
+          imageAlt="Bug Mascot"
+          trend="Needs triage"
+          trendUp={null}
         />
-        <MetricsCard
+        <BrandedWidget
+          title="In Progress"
+          value={inProgressIssues}
+          imageSrc="/assets/task_mascot.png"
+          imageAlt="Task Mascot"
+          trend="Currently forging"
+          trendUp={true}
+        />
+        <BrandedWidget
           title="Resolved"
           value={resolvedIssues}
-          icon={CheckCircle2}
+          imageSrc="/assets/resolved_mascot.png"
+          imageAlt="Resolved Mascot"
+          trend="Great job!"
           trendUp={true}
-          trend={`${Math.round((resolvedIssues / (issues.length || 1)) * 100)}% completion`}
         />
-        <MetricsCard
+        <BrandedWidget
           title="Critical Alerts"
           value={criticalIssues}
-          icon={AlertCircle}
-          trend={criticalIssues > 0 ? "Requires immediate attention" : "All good"}
+          imageSrc="/assets/critical_mascot.png"
+          imageAlt="Critical Mascot"
+          trend={criticalIssues > 0 ? "Requires action" : "All clear"}
           trendUp={criticalIssues === 0}
+          colorClass={criticalIssues > 0 ? "bg-destructive/10 border-destructive/30" : "bg-surface"}
         />
       </div>
 
-      <div className="flex flex-col space-y-4">
+      {/* Issue Table Section */}
+      <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold tracking-tight">Recent Issues</h3>
+          <h2 className="font-heading font-black text-3xl tracking-tight text-foreground flex items-center gap-3">
+            <span className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center text-sm transform rotate-3">
+              I
+            </span>
+            Recent Issues
+          </h2>
         </div>
         {isLoading ? (
-          <div className="h-64 flex items-center justify-center rounded-xl border bg-card text-muted-foreground">
-            Loading issues...
+          <div className="h-[400px] flex items-center justify-center rounded-2xl border-2 border-border bg-surface text-muted-foreground font-bold animate-pulse">
+            Loading your forge...
+          </div>
+        ) : issues.length === 0 ? (
+          <div className="h-[400px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-surface/50 text-center space-y-6">
+            <div className="w-48 h-48 relative transform hover:scale-105 transition-transform duration-500">
+              <Image src="/assets/empty_state.png" alt="Quiet Forge" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain opacity-80" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-heading font-black text-2xl">Looks like your forge is quiet today.</h3>
+              <p className="text-secondary font-medium">No active issues found. Enjoy the peace or create a new one.</p>
+            </div>
+            <Link href="/create-issue">
+              <Button className="font-bold border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300">
+                Log New Issue
+              </Button>
+            </Link>
           </div>
         ) : (
-          <IssueTable issues={issues} />
+          <div className="rounded-2xl border-2 border-foreground shadow-[6px_6px_0px_0px_currentColor] overflow-hidden bg-card transition-all duration-300 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_currentColor]">
+            <IssueTable issues={issues} />
+          </div>
         )}
       </div>
     </div>

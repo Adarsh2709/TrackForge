@@ -10,32 +10,38 @@ import { Button } from "@/components/ui/button";
 export function Navbar() {
   const pathname = usePathname();
   
-  // Don't show navbar on auth pages
-  if (pathname === "/login" || pathname === "/register") {
+  // Don't show navbar on auth and landing pages
+  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
     return null;
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 max-w-screen-2xl items-center justify-between px-4">
-        <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg tracking-tight hover:opacity-80 transition-opacity">
-            <div className="bg-primary text-primary-foreground p-1 rounded-md">
-              <LayoutDashboard size={20} />
+    <header className="sticky top-0 z-50 w-full border-b-2 border-border bg-background font-sans">
+      <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
+        <div className="flex items-center gap-8">
+          <Link href="/dashboard" className="flex items-center gap-2 font-heading font-black text-xl tracking-tight hover:-translate-y-[2px] transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center transform -rotate-3 border-2 border-foreground/10 shadow-sm">
+              T
             </div>
             <span>TrackForge</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-bold">
             <Link 
               href="/dashboard" 
-              className={`transition-colors hover:text-foreground/80 ${pathname === '/dashboard' ? 'text-foreground' : 'text-foreground/60'}`}
+              className={`transition-colors hover:text-primary ${pathname === '/dashboard' ? 'text-primary' : 'text-secondary'}`}
             >
               Dashboard
             </Link>
             <Link 
               href="/issues" 
-              className={`transition-colors hover:text-foreground/80 ${pathname?.startsWith('/issues') ? 'text-foreground' : 'text-foreground/60'}`}
+              className={`transition-colors hover:text-primary ${pathname?.startsWith('/issues') ? 'text-primary' : 'text-secondary'}`}
             >
               Issues
             </Link>
@@ -43,17 +49,17 @@ export function Navbar() {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-4 md:justify-end">
-          <div className="hidden md:flex relative w-full max-w-sm items-center">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <div className="hidden md:flex relative w-full max-w-sm items-center group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary group-focus-within:text-primary transition-colors" />
             <Input
               type="search"
               placeholder="Search issues..."
-              className="w-full rounded-full bg-muted/50 pl-9 pr-4 md:w-[300px] lg:w-[300px] border-muted hover:bg-muted/80 focus-visible:ring-1 focus-visible:ring-primary transition-all duration-300"
+              className="w-full h-10 rounded-xl bg-surface pl-10 pr-4 md:w-[300px] lg:w-[300px] border-2 border-border hover:border-primary focus-visible:ring-0 focus-visible:border-primary font-medium transition-all duration-300"
             />
           </div>
           <ThemeToggle />
           
-          <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-xl border-2 border-transparent hover:border-border bg-surface hover:bg-muted text-secondary hover:text-foreground transition-all">
             <LogOut className="h-5 w-5" />
           </Button>
         </div>

@@ -35,21 +35,21 @@ export function IssueTable({ issues }: IssueTableProps) {
   };
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+    <div className="w-full">
       <Table>
-        <TableHeader className="bg-muted/50">
+        <TableHeader className="bg-muted border-b-2 border-foreground">
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[100px] font-medium">ID</TableHead>
-            <TableHead className="font-medium">Title</TableHead>
-            <TableHead className="w-[120px] font-medium">Status</TableHead>
-            <TableHead className="w-[120px] font-medium">Priority</TableHead>
-            <TableHead className="w-[150px] font-medium">Created</TableHead>
+            <TableHead className="w-[100px] font-heading font-black text-foreground uppercase tracking-wider text-xs">ID</TableHead>
+            <TableHead className="font-heading font-black text-foreground uppercase tracking-wider text-xs">Title</TableHead>
+            <TableHead className="w-[120px] font-heading font-black text-foreground uppercase tracking-wider text-xs">Status</TableHead>
+            <TableHead className="w-[120px] font-heading font-black text-foreground uppercase tracking-wider text-xs">Priority</TableHead>
+            <TableHead className="w-[150px] font-heading font-black text-foreground uppercase tracking-wider text-xs text-right pr-6">Created</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {issues.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+              <TableCell colSpan={5} className="h-24 text-center font-medium text-secondary">
                 No issues found.
               </TableCell>
             </TableRow>
@@ -57,16 +57,18 @@ export function IssueTable({ issues }: IssueTableProps) {
             issues.map((issue) => (
               <TableRow 
                 key={issue.id}
-                className="cursor-pointer transition-colors hover:bg-muted/50 group"
+                className="cursor-pointer transition-colors hover:bg-muted/50 group border-b-2 border-border/50 last:border-0"
                 onClick={() => router.push(`/issues/${issue.id}`)}
               >
-                <TableCell className="font-mono text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                <TableCell className="font-mono text-xs font-bold text-secondary group-hover:text-primary transition-colors">
                   {issue.id.substring(0, 8)}
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    {getTypeIcon(issue.type)}
-                    <span className="font-medium">{issue.title}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 rounded-md bg-surface border-2 border-border group-hover:border-primary/50 transition-colors">
+                      {getTypeIcon(issue.type)}
+                    </div>
+                    <span className="font-bold text-foreground group-hover:text-primary transition-colors">{issue.title}</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -75,7 +77,7 @@ export function IssueTable({ issues }: IssueTableProps) {
                 <TableCell>
                   <PriorityBadge priority={issue.priority} />
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell className="text-sm font-medium text-secondary text-right pr-6">
                   {format(new Date(issue.createdAt), "MMM d, yyyy")}
                 </TableCell>
               </TableRow>
