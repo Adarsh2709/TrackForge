@@ -13,10 +13,6 @@ export default function DashboardPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchIssues();
-  }, []);
-
   const fetchIssues = async () => {
     try {
       const response = await api.get("/issues");
@@ -27,6 +23,10 @@ export default function DashboardPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchIssues();
+  }, []);
 
   const openIssues = issues.filter((i) => i.status === "Open" || i.status === "In Progress").length;
   const resolvedIssues = issues.filter((i) => i.status === "Resolved" || i.status === "Closed").length;

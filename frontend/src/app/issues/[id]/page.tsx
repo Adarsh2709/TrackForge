@@ -24,12 +24,6 @@ export default function IssueDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      fetchIssue(id as string);
-    }
-  }, [id]);
-
   const fetchIssue = async (issueId: string) => {
     try {
       const response = await api.get(`/issues/${issueId}`);
@@ -41,6 +35,13 @@ export default function IssueDetailsPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      fetchIssue(id as string);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleStatusChange = async (newStatus: string) => {
     if (!issue) return;
