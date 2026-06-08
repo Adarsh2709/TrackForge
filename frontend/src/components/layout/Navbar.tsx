@@ -25,16 +25,17 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b-2 border-border bg-background font-sans">
       <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 hover:-translate-y-[2px] transition-transform">
-            <div className="relative w-48 h-10 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
+          <Link href="/" className="flex items-center gap-3 hover:-translate-y-[2px] transition-transform group">
+            <div className="relative w-8 h-8 flex items-center justify-center transform group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
               <Image 
-                src="/assets/trackforge_logo.png" 
+                src="/assets/trackforge_icon.png" 
                 alt="TrackForge Logo" 
                 fill 
-                className="object-contain object-left"
-                sizes="(max-width: 768px) 150px, 200px"
+                className="object-contain"
+                sizes="32px"
               />
             </div>
+            <span className="font-heading font-black text-2xl tracking-tighter text-foreground">TrackForge</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-bold">

@@ -30,16 +30,17 @@ export default function LandingPage() {
 
       {/* Navigation */}
       <header className="relative z-10 container mx-auto px-6 h-20 flex items-center justify-between border-b-2 border-border/20">
-        <div className="flex items-center gap-2">
-          <div className="relative w-48 h-10 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
+        <div className="flex items-center gap-3 group cursor-pointer">
+          <div className="relative w-8 h-8 flex items-center justify-center transform group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
             <Image 
-              src="/assets/trackforge_logo.png" 
+              src="/assets/trackforge_icon.png" 
               alt="TrackForge Logo" 
               fill 
-              className="object-contain object-left"
-              sizes="(max-width: 768px) 150px, 200px"
+              className="object-contain"
+              sizes="32px"
             />
           </div>
+          <span className="font-heading font-black text-2xl tracking-tighter text-foreground">TrackForge</span>
         </div>
         <nav className="hidden md:flex gap-8 font-medium">
           <Link href="#" className="hover:-translate-y-[2px] transition-transform duration-300">Product</Link>
