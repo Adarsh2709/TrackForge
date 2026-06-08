@@ -25,9 +25,15 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b-2 border-border bg-background font-sans">
       <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
         <div className="flex items-center gap-8">
-          <Link href="/dashboard" className="flex items-center gap-2 font-heading font-black text-xl tracking-tight hover:-translate-y-[2px] transition-transform">
-            <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center transform -rotate-3 border-2 border-foreground/10 shadow-sm">
-              T
+          <Link href="/" className="flex items-center gap-2 font-heading font-black text-xl tracking-tight hover:-translate-y-[2px] transition-transform">
+            <div className="relative w-10 h-10 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
+              <Image 
+                src="/assets/trackforge_logo.png" 
+                alt="TrackForge Logo" 
+                fill 
+                className="object-contain"
+                sizes="40px"
+              />
             </div>
             <span>TrackForge</span>
           </Link>

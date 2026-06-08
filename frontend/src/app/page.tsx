@@ -1,9 +1,22 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function LandingPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if the user has a token in local storage
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    }
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-background flex flex-col font-sans overflow-hidden">
       {/* Subtle Dot Pattern Background */}
@@ -18,8 +31,14 @@ export default function LandingPage() {
       {/* Navigation */}
       <header className="relative z-10 container mx-auto px-6 h-20 flex items-center justify-between border-b-2 border-border/20">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-heading font-bold text-xl transform -rotate-3 border-2 border-foreground/10">
-            T
+          <div className="relative w-10 h-10 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
+            <Image 
+              src="/assets/trackforge_logo.png" 
+              alt="TrackForge Logo" 
+              fill 
+              className="object-contain"
+              sizes="40px"
+            />
           </div>
           <span className="font-heading font-black text-2xl tracking-tighter">TrackForge</span>
         </div>
@@ -30,14 +49,24 @@ export default function LandingPage() {
           <Link href="#" className="hover:-translate-y-[2px] transition-transform duration-300">Pricing</Link>
         </nav>
         <div className="flex items-center gap-4 font-medium">
-          <Link href="/login" className="hidden md:block hover:-translate-y-[2px] transition-transform duration-300">
-            Log in
-          </Link>
-          <Link href="/register">
-            <Button className="font-bold border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
-              Sign up free
-            </Button>
-          </Link>
+          {isLoggedIn ? (
+            <Link href="/dashboard">
+              <Button className="font-bold border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
+                Your Workspace
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="hidden md:block hover:-translate-y-[2px] transition-transform duration-300">
+                Log in
+              </Link>
+              <Link href="/register">
+                <Button className="font-bold border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
+                  Sign up free
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -66,16 +95,19 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-            <Link href="/register" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-8 font-bold border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
-                Start Tracking <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
-            <Link href="/login" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg h-14 px-8 font-bold border-2 border-border bg-surface hover:bg-muted transition-colors duration-300 text-foreground">
-                <PlayCircle className="mr-2 w-5 h-5 text-accent" /> Explore Demo
-              </Button>
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-8 font-bold border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
+                  Enter Workspace <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-8 font-bold border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
+                  Start Tracking <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            )}
           </div>
           
           <div className="pt-8 flex items-center gap-4 text-sm font-medium text-secondary/80">
