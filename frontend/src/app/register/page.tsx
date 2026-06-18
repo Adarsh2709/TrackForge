@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -109,8 +110,8 @@ export default function RegisterPage() {
         
         <div className="w-full max-w-md mx-auto space-y-10 my-auto">
           <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-accent text-accent-foreground flex items-center justify-center font-heading font-bold text-2xl transform rotate-6 mb-6 border-2 border-foreground/10 shadow-sm">
-              T
+            <div className="w-16 h-16 transform rotate-6 mb-6">
+              <Image src="/assets/trackforge_icon.png" alt="TrackForge Logo" width={64} height={64} className="object-contain drop-shadow-md" />
             </div>
             <h1 className="font-heading font-black text-4xl tracking-tight text-foreground">Create Account</h1>
             <p className="text-secondary font-medium">
@@ -168,12 +169,21 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel className="font-bold">Password</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="••••••••" 
-                        {...field} 
-                        className="h-14 rounded-xl border-2 border-border bg-surface focus-visible:ring-accent focus-visible:border-accent transition-all font-medium"
-                      />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="••••••••" 
+                          {...field} 
+                          className="h-14 pr-12 rounded-xl border-2 border-border bg-surface focus-visible:ring-accent focus-visible:border-accent transition-all font-medium"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-foreground transition-colors"
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage className="font-medium" />
                   </FormItem>
