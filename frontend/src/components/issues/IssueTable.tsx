@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { Issue } from "@/types";
-import { StatusBadge, PriorityBadge } from "@/components/shared/StatusBadge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { AIPriorityBadge } from "@/components/ai/AIPriorityBadge";
 import {
   Table,
   TableBody,
@@ -12,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Bug, FileCode, CheckCircle2, ListTodo } from "lucide-react";
+import { Bug, FileCode, CheckCircle2, ListTodo, Sparkles } from "lucide-react";
 
 interface IssueTableProps {
   issues: Issue[];
@@ -35,21 +36,24 @@ export function IssueTable({ issues }: IssueTableProps) {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-auto">
       <Table>
         <TableHeader className="bg-muted border-b-2 border-foreground">
           <TableRow className="hover:bg-transparent">
             <TableHead className="w-[100px] font-heading font-black text-foreground uppercase tracking-wider text-xs">ID</TableHead>
             <TableHead className="font-heading font-black text-foreground uppercase tracking-wider text-xs">Title</TableHead>
             <TableHead className="w-[120px] font-heading font-black text-foreground uppercase tracking-wider text-xs">Status</TableHead>
-            <TableHead className="w-[120px] font-heading font-black text-foreground uppercase tracking-wider text-xs">Priority</TableHead>
+            <TableHead className="w-[140px] font-heading font-black text-foreground uppercase tracking-wider text-xs">Priority</TableHead>
+            <TableHead className="w-[100px] font-heading font-black text-foreground uppercase tracking-wider text-xs flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> Risk
+            </TableHead>
             <TableHead className="w-[150px] font-heading font-black text-foreground uppercase tracking-wider text-xs text-right pr-6">Created</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {issues.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center font-medium text-secondary">
+              <TableCell colSpan={6} className="h-24 text-center font-medium text-secondary">
                 No issues found.
               </TableCell>
             </TableRow>
@@ -75,7 +79,16 @@ export function IssueTable({ issues }: IssueTableProps) {
                   <StatusBadge status={issue.status} />
                 </TableCell>
                 <TableCell>
-                  <PriorityBadge priority={issue.priority} />
+                  <AIPriorityBadge priority={issue.priority} />
+                </TableCell>
+                <TableCell>
+                  <span className={`font-mono text-xs px-2 py-1 rounded-md font-bold ${
+                    (issue.riskScore || 0) >= 80 ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+                    (issue.riskScore || 0) >= 50 ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
+                    'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                  }`}>
+                    {issue.riskScore || 0}/100
+                  </span>
                 </TableCell>
                 <TableCell className="text-sm font-medium text-secondary text-right pr-6">
                   {format(new Date(issue.createdAt), "MMM d, yyyy")}

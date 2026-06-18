@@ -21,4 +21,9 @@ public class Issue {
     private String createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    // AI Features
+    private Integer riskScore;
+    private String estimatedImpact;
+    private String aiExplanation;
 }

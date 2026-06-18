@@ -7,15 +7,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class IssueRequest {
-    private String title;
-    private String description;
-    private String type;
+@AllArgsConstructor
+public class PrioritizationResponseDTO {
     private String priority;
-    private String status;
     private Integer riskScore;
     private String estimatedImpact;
-    private String aiExplanation;
+    private String shortExplanation;
 }

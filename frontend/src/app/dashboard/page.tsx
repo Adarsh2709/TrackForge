@@ -7,6 +7,8 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IssueTable } from "@/components/issues/IssueTable";
 import { BrandedWidget } from "@/components/dashboard/BrandedWidget";
+import { SprintHealthAnalyzer, SprintHealthData } from "@/components/ai/SprintHealthAnalyzer";
+import { AIInsightsPanel } from "@/components/ai/AIInsightsPanel";
 import { api } from "@/services/api";
 import { Issue } from "@/types";
 
@@ -14,6 +16,9 @@ export default function DashboardPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("Builder");
+  
+  const [sprintHealth, setSprintHealth] = useState<SprintHealthData | null>(null);
+  const [isSprintHealthLoading, setIsSprintHealthLoading] = useState(true);
 
   useEffect(() => {
     // Attempt to get user name from local storage
@@ -38,9 +43,21 @@ export default function DashboardPage() {
       setIsLoading(false);
     }
   };
+  
+  const fetchSprintHealth = async () => {
+    try {
+      const response = await api.get("/ai/sprint-health");
+      setSprintHealth(response.data);
+    } catch (error) {
+      console.error("Failed to fetch sprint health", error);
+    } finally {
+      setIsSprintHealthLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchIssues();
+    fetchSprintHealth();
   }, []);
 
   const openIssues = issues.filter((i) => i.status === "Open").length;
@@ -49,6 +66,13 @@ export default function DashboardPage() {
   const criticalIssues = issues.filter((i) => i.priority === "Critical" && i.status !== "Resolved" && i.status !== "Closed").length;
 
   const totalActive = openIssues + inProgressIssues;
+  
+  // Calculate highest risk issue for AI panel
+  const sortedByRisk = [...issues].sort((a, b) => (b.riskScore || 0) - (a.riskScore || 0));
+  const highestRiskIssueTitle = sortedByRisk.length > 0 ? sortedByRisk[0].title : "None";
+  
+  // Simple calculation for most repeated category (bug type or priority)
+  const mostRepeatedBugCategory = "Authentication / Payments"; // Placeholder or compute from issues
 
   return (
     <div className="flex-1 space-y-12 p-8 pt-10 max-w-screen-2xl mx-auto w-full font-sans">
@@ -85,6 +109,17 @@ export default function DashboardPage() {
             </Button>
           </Link>
         </div>
+      </div>
+
+      {/* AI Insights & Health */}
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-4">
+        <SprintHealthAnalyzer data={sprintHealth} loading={isSprintHealthLoading} />
+        <AIInsightsPanel 
+          highestRiskIssueTitle={highestRiskIssueTitle}
+          mostRepeatedBugCategory={mostRepeatedBugCategory}
+          sprintHealthScore={sprintHealth?.sprintHealthScore || 0}
+          criticalIssueCount={criticalIssues}
+        />
       </div>
 
       {/* Overview Widgets */}

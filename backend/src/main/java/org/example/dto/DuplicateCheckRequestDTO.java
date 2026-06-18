@@ -7,15 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class IssueRequest {
+@AllArgsConstructor
+public class DuplicateCheckRequestDTO {
     private String title;
     private String description;
-    private String type;
-    private String priority;
-    private String status;
-    private Integer riskScore;
-    private String estimatedImpact;
-    private String aiExplanation;
 }

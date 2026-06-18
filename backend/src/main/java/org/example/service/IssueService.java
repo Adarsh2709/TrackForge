@@ -28,6 +28,9 @@ public class IssueService {
                 .type(request.getType())
                 .priority(request.getPriority())
                 .status(request.getStatus() != null ? request.getStatus() : "Open")
+                .riskScore(request.getRiskScore())
+                .estimatedImpact(request.getEstimatedImpact())
+                .aiExplanation(request.getAiExplanation())
                 .createdBy(getCurrentUserEmail())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -53,6 +56,15 @@ public class IssueService {
         issue.setPriority(request.getPriority());
         if (request.getStatus() != null) {
             issue.setStatus(request.getStatus());
+        }
+        if (request.getRiskScore() != null) {
+            issue.setRiskScore(request.getRiskScore());
+        }
+        if (request.getEstimatedImpact() != null) {
+            issue.setEstimatedImpact(request.getEstimatedImpact());
+        }
+        if (request.getAiExplanation() != null) {
+            issue.setAiExplanation(request.getAiExplanation());
         }
         issue.setUpdatedAt(LocalDateTime.now());
         

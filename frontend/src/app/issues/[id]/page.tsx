@@ -18,6 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { AIPriorityBadge } from "@/components/ai/AIPriorityBadge";
+import { Sparkles } from "lucide-react";
+
 export default function IssueDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -106,6 +109,26 @@ export default function IssueDetailsPage() {
               {issue.description}
             </div>
           </div>
+          
+          {issue.aiExplanation && (
+            <div>
+              <h3 className="font-heading font-black text-2xl flex items-center gap-3 text-blue-600 mb-4">
+                <Sparkles className="h-6 w-6" />
+                AI Analysis
+              </h3>
+              <div className="bg-blue-500/5 border-2 border-blue-500/20 rounded-2xl p-6 shadow-sm">
+                <p className="font-medium text-foreground">{issue.aiExplanation}</p>
+                <div className="mt-4 flex gap-4 text-sm font-semibold">
+                  <span className="bg-blue-500/10 text-blue-600 px-3 py-1 rounded-full">
+                    Risk Score: {issue.riskScore}/100
+                  </span>
+                  <span className="bg-blue-500/10 text-blue-600 px-3 py-1 rounded-full">
+                    Impact: {issue.estimatedImpact}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-6">
             <h3 className="font-heading font-black text-2xl flex items-center gap-3">
@@ -168,7 +191,7 @@ export default function IssueDetailsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-secondary">Priority</span>
-                  <PriorityBadge priority={issue.priority} />
+                  <AIPriorityBadge priority={issue.priority} />
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-secondary">Reporter</span>

@@ -8,6 +8,9 @@ export interface Issue {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  riskScore?: number;
+  estimatedImpact?: string;
+  aiExplanation?: string;
 }
 
 export interface User {
