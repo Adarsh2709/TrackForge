@@ -1,9 +1,8 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Sparkles, AlertTriangle, CheckCircle2, Info, Loader2, RefreshCw } from 'lucide-react';
+import { Sparkles, AlertTriangle, CheckCircle2, Info, Loader2, RefreshCw, Clock } from 'lucide-react';
 import { api } from '@/services/api';
 
 export interface SprintHealthData {
@@ -13,39 +12,56 @@ export interface SprintHealthData {
   recommendations: string[];
 }
 
+type ViewState = 'idle' | 'loading' | 'error' | 'rate-limited' | 'success';
+
 export function SprintHealthAnalyzer() {
+  const [view, setView] = useState<ViewState>('idle');
   const [data, setData] = useState<SprintHealthData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [rateLimited, setRateLimited] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Countdown timer for rate limit
+  useEffect(() => {
+    if (countdown <= 0) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [countdown > 0]);
 
   const analyze = async () => {
-    setLoading(true);
-    setError(null);
-    setRateLimited(false);
+    setView('loading');
+    setData(null);
     try {
       const response = await api.get('/ai/sprint-health');
       const result: SprintHealthData = response.data;
       // Detect rate-limit fallback from backend
       if (result.bottlenecks?.some(b => b.toLowerCase().includes('rate limit'))) {
-        setRateLimited(true);
-        setData(null);
+        setCountdown(60);
+        setView('rate-limited');
       } else {
         setData(result);
+        setView('success');
       }
     } catch (err: any) {
-      setError('AI analysis failed. Please try again in a moment.');
-    } finally {
-      setLoading(false);
+      setView('error');
     }
   };
 
   const getRiskIcon = (level: string) => {
-    switch (level.toLowerCase()) {
+    switch (level?.toLowerCase()) {
       case 'low': return <CheckCircle2 className="w-6 h-6 text-green-500" />;
-      case 'medium': return <AlertTriangle className="w-6 h-6 text-yellow-500" />;
       case 'high': return <AlertTriangle className="w-6 h-6 text-red-500" />;
-      default: return <Info className="w-6 h-6 text-blue-500" />;
+      default: return <AlertTriangle className="w-6 h-6 text-yellow-500" />;
     }
   };
 
@@ -76,12 +92,14 @@ export function SprintHealthAnalyzer() {
           </div>
           <Button
             onClick={analyze}
-            disabled={loading}
-            className="h-10 px-4 font-bold border-2 border-foreground shadow-[3px_3px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 bg-primary text-primary-foreground"
+            disabled={view === 'loading' || countdown > 0}
+            className="h-10 px-4 font-bold border-2 border-foreground shadow-[3px_3px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[3px_3px_0px_0px_currentColor]"
           >
-            {loading ? (
+            {view === 'loading' ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing...</>
-            ) : data ? (
+            ) : countdown > 0 ? (
+              <><Clock className="w-4 h-4 mr-2" /> Wait {countdown}s</>
+            ) : view === 'success' ? (
               <><RefreshCw className="w-4 h-4 mr-2" /> Re-Analyze</>
             ) : (
               <><Sparkles className="w-4 h-4 mr-2" /> Analyze Sprint</>
@@ -91,20 +109,21 @@ export function SprintHealthAnalyzer() {
       </CardHeader>
 
       <CardContent className="pt-6">
+
         {/* Idle State */}
-        {!data && !loading && !error && (
+        {view === 'idle' && (
           <div className="h-40 flex flex-col items-center justify-center gap-3 text-center">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
               <Sparkles className="w-7 h-7 text-primary" />
             </div>
             <p className="text-secondary font-medium text-sm max-w-xs">
-              Click <strong className="text-foreground">"Analyze Sprint"</strong> to get an AI-powered health report of your current sprint based on your open issues.
+              Click <strong className="text-foreground">"Analyze Sprint"</strong> to get an AI-powered health report of your current sprint.
             </p>
           </div>
         )}
 
         {/* Loading State */}
-        {loading && (
+        {view === 'loading' && (
           <div className="h-40 flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
             <p className="text-secondary font-medium text-sm">Gemini is analyzing your sprint data...</p>
@@ -112,34 +131,35 @@ export function SprintHealthAnalyzer() {
         )}
 
         {/* Error State */}
-        {error && !loading && (
+        {view === 'error' && (
           <div className="h-40 flex flex-col items-center justify-center gap-3 text-center">
             <AlertTriangle className="w-8 h-8 text-destructive" />
-            <p className="text-destructive font-medium text-sm">{error}</p>
-            <Button variant="outline" size="sm" onClick={analyze} className="font-bold">
-              Try Again
-            </Button>
+            <p className="text-destructive font-medium text-sm">AI analysis failed. Please check your connection and try again.</p>
+            <Button variant="outline" size="sm" onClick={analyze} className="font-bold">Try Again</Button>
           </div>
         )}
 
         {/* Rate Limited State */}
-        {rateLimited && !loading && (
+        {view === 'rate-limited' && (
           <div className="h-40 flex flex-col items-center justify-center gap-3 text-center px-4">
-            <div className="w-12 h-12 rounded-full bg-yellow-500/10 border-2 border-yellow-500/30 flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-yellow-500" />
+            <div className="w-14 h-14 rounded-2xl bg-yellow-500/10 border-2 border-yellow-500/30 flex items-center justify-center">
+              <Clock className="w-7 h-7 text-yellow-500" />
             </div>
             <div>
-              <p className="font-black text-foreground text-sm">API Rate Limit Reached</p>
-              <p className="text-secondary text-xs mt-1">Gemini's free tier allows 10 requests/min.<br/>Please wait <strong className="text-foreground">1 minute</strong> then click Re-Analyze.</p>
+              <p className="font-black text-foreground">API Rate Limit Reached</p>
+              <p className="text-secondary text-sm mt-1">
+                Gemini free tier: 10 requests/min.
+                {countdown > 0
+                  ? <> Button re-enables in <strong className="text-primary">{countdown}s</strong>.</>
+                  : <> Click <strong className="text-primary">Re-Analyze</strong> to try again.</>
+                }
+              </p>
             </div>
-            <Button variant="outline" size="sm" onClick={analyze} className="font-bold border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/10">
-              <RefreshCw className="w-3 h-3 mr-1" /> Retry Now
-            </Button>
           </div>
         )}
 
         {/* Results */}
-        {data && !loading && (
+        {view === 'success' && data && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
@@ -167,7 +187,7 @@ export function SprintHealthAnalyzer() {
             </div>
 
             <div className="space-y-4">
-              {data.bottlenecks && data.bottlenecks.length > 0 && (
+              {data.bottlenecks?.length > 0 && (
                 <div>
                   <h4 className="text-sm font-black mb-2 flex items-center gap-1 text-orange-500 uppercase tracking-wider">
                     <AlertTriangle className="w-4 h-4" /> Bottlenecks
@@ -183,7 +203,7 @@ export function SprintHealthAnalyzer() {
                 </div>
               )}
 
-              {data.recommendations && data.recommendations.length > 0 && (
+              {data.recommendations?.length > 0 && (
                 <div>
                   <h4 className="text-sm font-black mb-2 flex items-center gap-1 text-green-500 uppercase tracking-wider">
                     <CheckCircle2 className="w-4 h-4" /> Recommendations
