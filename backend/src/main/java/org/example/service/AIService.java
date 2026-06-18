@@ -71,7 +71,15 @@ public class AIService {
         }
     }
 
+    private SprintHealthResponseDTO cachedSprintHealth;
+    private long lastSprintHealthFetchTime = 0;
+    private static final long CACHE_DURATION_MS = 60000; // 1 minute
+
     public SprintHealthResponseDTO getSprintHealth() {
+        if (cachedSprintHealth != null && (System.currentTimeMillis() - lastSprintHealthFetchTime) < CACHE_DURATION_MS) {
+            return cachedSprintHealth;
+        }
+
         List<Issue> issues = issueRepository.findAll();
         
         long totalOpen = issues.stream().filter(i -> !"DONE".equalsIgnoreCase(i.getStatus())).count();
@@ -87,7 +95,10 @@ public class AIService {
 
         try {
             String jsonResponse = geminiClient.generateContent(prompt);
-            return objectMapper.readValue(jsonResponse, SprintHealthResponseDTO.class);
+            SprintHealthResponseDTO response = objectMapper.readValue(jsonResponse, SprintHealthResponseDTO.class);
+            cachedSprintHealth = response;
+            lastSprintHealthFetchTime = System.currentTimeMillis();
+            return response;
         } catch (Exception e) {
             log.error("Failed to get sprint health via AI", e);
             return SprintHealthResponseDTO.builder()
