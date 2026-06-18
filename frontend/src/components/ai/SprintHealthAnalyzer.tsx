@@ -20,23 +20,29 @@ export function SprintHealthAnalyzer() {
   const [countdown, setCountdown] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Countdown timer for rate limit
+  // Countdown timer for rate limit — runs once when countdown is first set
   useEffect(() => {
-    if (countdown <= 0) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      return;
-    }
+    if (countdown <= 0) return;
+    // Clear any existing interval before starting a new one
+    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
+          timerRef.current = null;
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [countdown > 0]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown === 0 ? 0 : 1]); // only re-run when transitioning from 0 → non-zero
 
   const analyze = async () => {
     setView('loading');
@@ -46,7 +52,7 @@ export function SprintHealthAnalyzer() {
       const result: SprintHealthData = response.data;
       // Detect rate-limit fallback from backend
       if (result.bottlenecks?.some(b => b.toLowerCase().includes('rate limit'))) {
-        setCountdown(60);
+        setCountdown(65); // 65s covers the full 1-min Gemini rate limit window
         setView('rate-limited');
       } else {
         setData(result);
@@ -126,7 +132,7 @@ export function SprintHealthAnalyzer() {
         {view === 'loading' && (
           <div className="h-40 flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            <p className="text-secondary font-medium text-sm">Gemini is analyzing your sprint data...</p>
+            <p className="text-secondary font-medium text-sm">AI is analyzing your sprint data...</p>
           </div>
         )}
 
@@ -148,7 +154,7 @@ export function SprintHealthAnalyzer() {
             <div>
               <p className="font-black text-foreground">API Rate Limit Reached</p>
               <p className="text-secondary text-sm mt-1">
-                Gemini free tier: 10 requests/min.
+                Gemini API limit: 10 requests/min.
                 {countdown > 0
                   ? <> Button re-enables in <strong className="text-primary">{countdown}s</strong>.</>
                   : <> Click <strong className="text-primary">Re-Analyze</strong> to try again.</>

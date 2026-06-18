@@ -80,13 +80,14 @@ public class AIService {
         }
     }
 
-    // Cache: 10 minutes — prevents rate limit hammering
+    // Cache: only successful responses for 10 minutes
+    // Rate-limit errors are NOT cached — the frontend 65s countdown handles retry timing
     private SprintHealthResponseDTO cachedSprintHealth;
     private long lastSprintHealthFetchTime = 0;
     private static final long CACHE_DURATION_MS = 10 * 60 * 1000; // 10 minutes
 
     public SprintHealthResponseDTO getSprintHealth() {
-        // Return cached result if still fresh
+        // Return cached result only if it was a successful response
         if (cachedSprintHealth != null && (System.currentTimeMillis() - lastSprintHealthFetchTime) < CACHE_DURATION_MS) {
             log.info("Returning cached sprint health (age: {}s)", (System.currentTimeMillis() - lastSprintHealthFetchTime) / 1000);
             return cachedSprintHealth;
@@ -110,21 +111,21 @@ public class AIService {
         try {
             String jsonResponse = geminiClient.generateContent(prompt);
             SprintHealthResponseDTO response = objectMapper.readValue(jsonResponse, SprintHealthResponseDTO.class);
-            // Cache successful response
+            // Only cache successful responses
             cachedSprintHealth = response;
             lastSprintHealthFetchTime = System.currentTimeMillis();
             log.info("Sprint health analysis successful, cached for 10 minutes.");
             return response;
         } catch (RateLimitException e) {
             log.warn("Rate limited on sprint health: {}", e.getMessage());
-            // Return rate-limit-specific message (not the ugly error)
+            // Do NOT cache — let the frontend 65s countdown handle retry timing
             return SprintHealthResponseDTO.builder()
                     .sprintHealthScore(0)
                     .riskLevel("Medium")
                     .bottlenecks(List.of("AI rate limit reached"))
                     .recommendations(List.of(
                         "You've hit Gemini's free tier limit (10 requests/min).",
-                        "Please wait 1-2 minutes, then click 'Re-Analyze'."
+                        "Please wait 1 minute, then click 'Re-Analyze'."
                     ))
                     .build();
         } catch (Exception e) {
