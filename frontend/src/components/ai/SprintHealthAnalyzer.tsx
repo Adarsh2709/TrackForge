@@ -84,22 +84,22 @@ export function SprintHealthAnalyzer() {
   };
 
   return (
-    <Card className="col-span-3 border-2 border-border shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-surface">
+    <Card className="border-2 border-border shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-surface h-full">
       <CardHeader className="border-b-2 border-border/50 pb-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="font-heading font-black flex items-center gap-2 text-2xl tracking-tight text-foreground">
-              <Sparkles className="w-6 h-6 text-primary" />
-              AI Sprint Health Analyzer
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <CardTitle className="font-heading font-black flex items-center gap-2 text-xl sm:text-2xl tracking-tight text-foreground">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+              <span className="truncate">AI Sprint Health Analyzer</span>
             </CardTitle>
-            <CardDescription className="text-secondary font-medium mt-1">
+            <CardDescription className="text-secondary font-medium mt-1 text-sm">
               Gemini AI insights based on current sprint metrics
             </CardDescription>
           </div>
           <Button
             onClick={analyze}
             disabled={view === 'loading' || countdown > 0}
-            className="h-10 px-4 font-bold border-2 border-foreground shadow-[3px_3px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[3px_3px_0px_0px_currentColor]"
+            className="w-full sm:w-auto flex-shrink-0 h-10 px-4 font-bold border-2 border-foreground shadow-[3px_3px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[3px_3px_0px_0px_currentColor]"
           >
             {view === 'loading' ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing...</>
@@ -166,7 +166,7 @@ export function SprintHealthAnalyzer() {
 
         {/* Results */}
         {view === 'success' && data && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between items-end mb-2">

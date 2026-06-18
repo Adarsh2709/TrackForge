@@ -80,7 +80,7 @@ export default function LandingPage() {
             TrackForge 2.0 is Live
           </div>
           
-          <h1 className="font-heading font-black text-6xl md:text-8xl leading-[0.95] tracking-tighter text-foreground drop-shadow-sm">
+          <h1 className="font-heading font-black text-4xl sm:text-6xl md:text-8xl leading-[0.95] tracking-tighter text-foreground drop-shadow-sm">
             Track Every Issue.<br/>
             <span className="text-primary relative inline-block">
               Ship With Confidence.

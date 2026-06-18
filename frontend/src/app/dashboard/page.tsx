@@ -62,12 +62,12 @@ export default function DashboardPage() {
   const mostRepeatedBugCategory = "Authentication / Payments"; // Placeholder or compute from issues
 
   return (
-    <div className="flex-1 space-y-12 p-8 pt-10 max-w-screen-2xl mx-auto w-full font-sans">
+    <div className="flex-1 space-y-8 sm:space-y-12 p-4 sm:p-8 pt-6 sm:pt-10 max-w-screen-2xl mx-auto w-full font-sans">
       
       {/* Welcome Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-border/50 pb-8">
-        <div className="flex items-center gap-6">
-          <div className="hidden sm:block w-24 h-24 relative transform -rotate-6 hover:rotate-0 transition-transform duration-500">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-2 border-border/50 pb-6 sm:pb-8">
+        <div className="flex items-center gap-4 sm:gap-6">
+          <div className="hidden sm:block w-20 h-20 sm:w-24 sm:h-24 relative transform -rotate-6 hover:rotate-0 transition-transform duration-500">
             <Image
               src="/assets/hero_mascot.png"
               alt="TrackForge Mascot"
@@ -77,10 +77,10 @@ export default function DashboardPage() {
             />
           </div>
           <div>
-            <h1 className="font-heading font-black text-4xl md:text-5xl tracking-tight text-foreground mb-2">
+            <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-foreground mb-1 sm:mb-2">
               Good Morning, {userName}.
             </h1>
-            <p className="text-secondary text-lg font-medium flex items-center gap-2">
+            <p className="text-secondary text-base sm:text-lg font-medium flex items-center gap-2">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
@@ -89,10 +89,10 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-        <div>
-          <Link href="/create-issue">
-            <Button size="lg" className="h-14 px-8 font-bold text-lg border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
-              <Plus className="mr-2 h-6 w-6" /> New Issue
+        <div className="w-full sm:w-auto">
+          <Link href="/create-issue" className="block sm:inline-block">
+            <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 font-bold text-base sm:text-lg border-2 border-foreground shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-primary text-primary-foreground">
+              <Plus className="mr-2 h-5 w-5 sm:h-6 sm:w-6" /> New Issue
             </Button>
           </Link>
         </div>
@@ -100,17 +100,21 @@ export default function DashboardPage() {
 
       {/* AI Insights & Health */}
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-4">
-        <SprintHealthAnalyzer />
-        <AIInsightsPanel 
-          highestRiskIssueTitle={highestRiskIssueTitle}
-          mostRepeatedBugCategory={mostRepeatedBugCategory}
-          sprintHealthScore={0}
-          criticalIssueCount={criticalIssues}
-        />
+        <div className="lg:col-span-3">
+          <SprintHealthAnalyzer />
+        </div>
+        <div className="lg:col-span-1">
+          <AIInsightsPanel 
+            highestRiskIssueTitle={highestRiskIssueTitle}
+            mostRepeatedBugCategory={mostRepeatedBugCategory}
+            sprintHealthScore={0}
+            criticalIssueCount={criticalIssues}
+          />
+        </div>
       </div>
 
       {/* Overview Widgets */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
         <BrandedWidget
           title="Open Issues"
           value={openIssues}
@@ -147,10 +151,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Issue Table Section */}
-      <div className="flex flex-col space-y-6">
+      <div className="flex flex-col space-y-4 sm:space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="font-heading font-black text-3xl tracking-tight text-foreground flex items-center gap-3">
-            <span className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center text-sm transform rotate-3">
+          <h2 className="font-heading font-black text-2xl sm:text-3xl tracking-tight text-foreground flex items-center gap-3">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-foreground text-background flex items-center justify-center text-sm transform rotate-3">
               I
             </span>
             Recent Issues

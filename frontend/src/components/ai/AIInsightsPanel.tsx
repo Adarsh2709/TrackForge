@@ -16,15 +16,15 @@ export function AIInsightsPanel({
   criticalIssueCount = 0
 }: AIInsightsPanelProps) {
   return (
-    <Card className="col-span-full relative overflow-hidden border-2 border-border shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-surface">
+    <Card className="border-2 border-border shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 bg-surface h-full">
       <CardHeader className="border-b-2 border-border/50 pb-4">
-        <CardTitle className="font-heading font-black flex items-center gap-2 text-2xl tracking-tight text-foreground">
-          <BrainCircuit className="w-6 h-6 text-primary" />
+        <CardTitle className="font-heading font-black flex items-center gap-2 text-xl sm:text-2xl tracking-tight text-foreground">
+          <BrainCircuit className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
           AI Engineering Insights
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <CardContent className="pt-4 sm:pt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
           <div className="p-5 rounded-xl bg-surface border-2 border-border shadow-[4px_4px_0px_0px_currentColor] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 group">
             <div className="flex items-center gap-2 text-destructive mb-3">
               <Target className="w-5 h-5 group-hover:scale-110 transition-transform" />
