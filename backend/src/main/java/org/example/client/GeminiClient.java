@@ -40,7 +40,8 @@ public class GeminiClient {
             ),
             "generationConfig", Map.of(
                 "response_mime_type", "application/json",
-                "maxOutputTokens", 1024
+                "maxOutputTokens", 8192,
+                "thinkingConfig", Map.of("thinkingBudget", 0)
             )
         );
 
