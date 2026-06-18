@@ -7,7 +7,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IssueTable } from "@/components/issues/IssueTable";
 import { BrandedWidget } from "@/components/dashboard/BrandedWidget";
-import { SprintHealthAnalyzer, SprintHealthData } from "@/components/ai/SprintHealthAnalyzer";
+import { SprintHealthAnalyzer } from "@/components/ai/SprintHealthAnalyzer";
 import { AIInsightsPanel } from "@/components/ai/AIInsightsPanel";
 import { api } from "@/services/api";
 import { Issue } from "@/types";
@@ -17,8 +17,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("Builder");
   
-  const [sprintHealth, setSprintHealth] = useState<SprintHealthData | null>(null);
-  const [isSprintHealthLoading, setIsSprintHealthLoading] = useState(true);
+
 
   useEffect(() => {
     // Attempt to get user name from local storage
@@ -44,20 +43,8 @@ export default function DashboardPage() {
     }
   };
   
-  const fetchSprintHealth = async () => {
-    try {
-      const response = await api.get("/ai/sprint-health");
-      setSprintHealth(response.data);
-    } catch (error) {
-      console.error("Failed to fetch sprint health", error);
-    } finally {
-      setIsSprintHealthLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchIssues();
-    fetchSprintHealth();
   }, []);
 
   const openIssues = issues.filter((i) => i.status === "Open").length;
@@ -113,11 +100,11 @@ export default function DashboardPage() {
 
       {/* AI Insights & Health */}
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-4">
-        <SprintHealthAnalyzer data={sprintHealth} loading={isSprintHealthLoading} />
+        <SprintHealthAnalyzer />
         <AIInsightsPanel 
           highestRiskIssueTitle={highestRiskIssueTitle}
           mostRepeatedBugCategory={mostRepeatedBugCategory}
-          sprintHealthScore={sprintHealth?.sprintHealthScore || 0}
+          sprintHealthScore={0}
           criticalIssueCount={criticalIssues}
         />
       </div>
