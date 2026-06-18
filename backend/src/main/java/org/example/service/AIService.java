@@ -38,7 +38,7 @@ public class AIService {
                     .priority("Medium")
                     .riskScore(50)
                     .estimatedImpact("Unknown")
-                    .shortExplanation("AI analysis failed.")
+                    .shortExplanation("AI analysis failed. Error: " + e.getMessage())
                     .build();
         }
     }
@@ -94,7 +94,7 @@ public class AIService {
                     .sprintHealthScore(50)
                     .riskLevel("Medium")
                     .bottlenecks(List.of("Unable to analyze bottlenecks"))
-                    .recommendations(List.of("Check AI service connection"))
+                    .recommendations(List.of("Check AI service connection", "Error: " + e.getMessage()))
                     .build();
         }
     }
