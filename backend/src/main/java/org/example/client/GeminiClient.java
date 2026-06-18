@@ -40,8 +40,9 @@ public class GeminiClient {
             )
         );
 
+        String cleanKey = apiKey != null ? apiKey.trim() : "";
         GeminiResponse response = webClient.post()
-                .uri(GEMINI_API_URL + "?key=" + apiKey)
+                .uri(GEMINI_API_URL + "?key=" + cleanKey)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .bodyValue(requestBody)
                 .retrieve()
@@ -49,7 +50,19 @@ public class GeminiClient {
                 .block();
 
         if (response != null && response.getCandidates() != null && !response.getCandidates().isEmpty()) {
-            return response.getCandidates().get(0).getContent().getParts().get(0).getText();
+            String text = response.getCandidates().get(0).getContent().getParts().get(0).getText();
+            if (text != null) {
+                text = text.trim();
+                if (text.startsWith("```json")) {
+                    text = text.substring(7).trim();
+                } else if (text.startsWith("```")) {
+                    text = text.substring(3).trim();
+                }
+                if (text.endsWith("```")) {
+                    text = text.substring(0, text.length() - 3).trim();
+                }
+            }
+            return text;
         }
         return "{}";
     }
