@@ -17,13 +17,22 @@ export function SprintHealthAnalyzer() {
   const [data, setData] = useState<SprintHealthData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rateLimited, setRateLimited] = useState(false);
 
   const analyze = async () => {
     setLoading(true);
     setError(null);
+    setRateLimited(false);
     try {
       const response = await api.get('/ai/sprint-health');
-      setData(response.data);
+      const result: SprintHealthData = response.data;
+      // Detect rate-limit fallback from backend
+      if (result.bottlenecks?.some(b => b.toLowerCase().includes('rate limit'))) {
+        setRateLimited(true);
+        setData(null);
+      } else {
+        setData(result);
+      }
     } catch (err: any) {
       setError('AI analysis failed. Please try again in a moment.');
     } finally {
@@ -109,6 +118,22 @@ export function SprintHealthAnalyzer() {
             <p className="text-destructive font-medium text-sm">{error}</p>
             <Button variant="outline" size="sm" onClick={analyze} className="font-bold">
               Try Again
+            </Button>
+          </div>
+        )}
+
+        {/* Rate Limited State */}
+        {rateLimited && !loading && (
+          <div className="h-40 flex flex-col items-center justify-center gap-3 text-center px-4">
+            <div className="w-12 h-12 rounded-full bg-yellow-500/10 border-2 border-yellow-500/30 flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6 text-yellow-500" />
+            </div>
+            <div>
+              <p className="font-black text-foreground text-sm">API Rate Limit Reached</p>
+              <p className="text-secondary text-xs mt-1">Gemini's free tier allows 10 requests/min.<br/>Please wait <strong className="text-foreground">1 minute</strong> then click Re-Analyze.</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={analyze} className="font-bold border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/10">
+              <RefreshCw className="w-3 h-3 mr-1" /> Retry Now
             </Button>
           </div>
         )}
