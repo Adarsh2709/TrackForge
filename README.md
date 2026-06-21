@@ -1,3 +1,8 @@
+# TrackForge
+
+TrackForge is an enterprise-grade issue tracking and project management system. It provides engineering teams with a robust, scalable, and modern interface for tracking bugs, feature requests, and tasks throughout the software development lifecycle. 
+
+The application is structured as a full-stack system consisting of a Java Spring Boot REST API and a Next.js React frontend.
 
 ## Architecture Overview
 
