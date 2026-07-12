@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # FRONTEND SERVICE
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: trackforge-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      # This tells Next.js where to send API requests
+      - NEXT_PUBLIC_API_URL=http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ==========================================
+  # BACKEND SERVICE
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trackforge-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # Injecting environment variables from the .env file
+      - SPRING_DATA_MONGODB_URI=${MONGODB_URI}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - app-network
+    restart: unless-stopped
+
+# Define a custom network so containers can communicate using their service names (e.g., http://backend:8080)
+networks:
+  app-network:
+    driver: bridge
