@@ -70,6 +70,19 @@ npm run dev
 
 The Next.js frontend will initialize and bind to `http://localhost:3000`. 
 
+## AWS ECS Deployment
+
+TrackForge can be deployed to AWS Elastic Container Service (ECS) using Fargate. 
+
+### 1. Build and Push Images
+Build the Docker images and push them to your Amazon ECR repositories (`trackforge-backend` and `trackforge-frontend`). Ensure your AWS CLI is authenticated.
+
+### 2. Infrastructure Setup
+Provision the following AWS resources via the AWS Console or Infrastructure as Code:
+- **ECS Cluster**: Create a Fargate cluster.
+- **Task Definitions**: Define tasks for backend and frontend. The frontend task requires the `NEXT_PUBLIC_API_URL` environment variable pointing to the backend's Application Load Balancer. The backend task requires `SPRING_DATA_MONGODB_URI` and `GEMINI_API_KEY`.
+- **Services & ALBs**: Create ECS services for both tasks and attach them to Application Load Balancers for public accessibility.
+
 ## Core Features
 
 *   **Secure Authentication**: Role-based access control and JWT session management.
